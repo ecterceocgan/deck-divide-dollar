@@ -35,9 +35,8 @@ In order to simplify the decision-making process, we define three actions availa
 
 
 
----
 ## References
 
-<a name="AshlockSchonfeldCardGames">[1]</a> D. Ashlock and J. Schonfeld. Tools for deriving card games from mathematical games. *Game & Puzzle Design*, 1(2):1–3, 2015. [↩](#a1)
+<a name="AshlockSchonfeldCardGames">[1]</a> D. Ashlock and J. Schonfeld. [Tools for deriving card games from mathematical games](http://eldar.mathstat.uoguelph.ca/dashlock/eprints/GTRY16.pdf). *Game & Puzzle Design*, 1(2):1–3, 2015. [&#x27A1;&#xfe0e;](#a1)
 
-<a name="BramsTaylor">[2]</a> S. J. Brams and A. D. Taylor. Divide the dollar: three solutions and extensions. *Theory and Decision*, 37:211–231, 1994. [↩](#a2)
+<a name="BramsTaylor">[2]</a> S. J. Brams and A. D. Taylor. [Divide the dollar: three solutions and extensions](https://doi.org/10.1007/BF01079266). *Theory and Decision*, 37:211–231, 1994. [&#x27A1;&#xfe0e;](#a2)

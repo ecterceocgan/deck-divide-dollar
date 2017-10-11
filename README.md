@@ -1,8 +1,8 @@
 # Deck-based divide-the-dollar
 
-A deck-based game is a mathematical game that has been transformed into a card game in which potential moves are limited to a set of cards drawn from a fixed deck [^1]. Each player must choose their strategy during each turn by selecting a card from their hand. Once chosen, the card is removed and cannot be played again.
+A deck-based game is a mathematical game that has been transformed into a card game in which potential moves are limited to a set of cards drawn from a fixed deck <a name="a1"></a>[[1](#AshlockSchonfeldCardGames)]. Each player must choose their strategy during each turn by selecting a card from their hand. Once chosen, the card is removed and cannot be played again.
 
-We will examine a deck-based version of the divide-the-dollar game. Divide-the-dollar is typically a simultaneous play (generalized Nash) game in which two players each make a bid to divide a dollar. If the sum of the bids is less than one, then each player gets to keep the amount of their bid [^2]. We will look at an iterated, two-player, turn- and deck-based version of this in which we have multiple rounds of players taking turns playing the first card.
+We will examine a deck-based version of the divide-the-dollar game. Divide-the-dollar is typically a simultaneous play (generalized Nash) game in which two players each make a bid to divide a dollar. If the sum of the bids is less than one, then each player gets to keep the amount of their bid <a name="a2"></a>[[2](#BramsTaylor)]. We will look at an iterated, two-player, turn- and deck-based version of this in which we have multiple rounds of players taking turns playing the first card.
 
 	from __future__ import division
 	import numpy as np
@@ -32,6 +32,6 @@ In order to simplify the decision-making process, we define three actions availa
 ---
 ## References
 
-[^1]: D. Ashlock and J. Schonfeld. Tools for deriving card games from mathematical games. Game & Puzzle Design, 1(2):1–3, 2015.
+<a name="AshlockSchonfeldCardGames">[1]</a> D. Ashlock and J. Schonfeld. Tools for deriving card games from mathematical games. *Game & Puzzle Design*, 1(2):1–3, 2015. [↩](#a1)
 
-[^2]: S. J. Brams and A. D. Taylor. Divide the dollar: three solutions and extensions. Theory and Decision, 37:211–231, 1994.
+<a name="BramsTaylor">[2]</a> S. J. Brams and A. D. Taylor. Divide the dollar: three solutions and extensions. *Theory and Decision*, 37:211–231, 1994. [↩](#a2)

@@ -4,24 +4,30 @@ A deck-based game is a mathematical game that has been transformed into a card g
 
 We will examine a deck-based version of the divide-the-dollar game. Divide-the-dollar is typically a simultaneous play (generalized Nash) game in which two players each make a bid to divide a dollar. If the sum of the bids is less than one, then each player gets to keep the amount of their bid <a name="a2"></a>[[2](#BramsTaylor)]. We will look at an iterated, two-player, turn- and deck-based version of this in which we have multiple rounds of players taking turns playing the first card.
 
-	from __future__ import division
-	import numpy as np
-	import math
+```python
+from __future__ import division
+import numpy as np
+import math
+```
 
 ## Game parameters
 
 First, we must specify the game itself. This includes defining the specific fractions used as cards as well as the corresponding number of these unique cards that we wish to include in a deck.
 
-	cards = [0.25, 0.50, 0.75]
-	num_unique_cards = [16, 28, 16]
-	num_cards = len(cards)
-	deck_size = sum(num_unique_cards)
+```python
+cards = [0.25, 0.50, 0.75]
+num_unique_cards = [16, 28, 16]
+num_cards = len(cards)
+deck_size = sum(num_unique_cards)
+```
 
 Following this we need to define the number of players, the number of cards each player holds in their hand, as well as the number of rounds which constitutes a game. Here, players will play cards until the deck is depleted and they can no longer maintain the specified hand size.
 
-	num_players = 2
-	hand_size = 5
-	num_rounds = 1+(deck_size-(num_players*hand_size))//num_players
+```python
+num_players = 2
+hand_size = 5
+num_rounds = 1+(deck_size-(num_players*hand_size))//num_players
+```
 
 ## Actions
 

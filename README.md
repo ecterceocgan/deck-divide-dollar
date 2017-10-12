@@ -1,4 +1,4 @@
-# Deck-based divide-the-dollar
+## Deck-based divide-the-dollar
 
 A deck-based game is a mathematical game that has been transformed into a card game in which potential moves are limited to a set of cards drawn from a fixed deck <a name="a1"></a>[[1](#AshlockSchonfeldCardGames)]. Each player must choose their strategy during each turn by selecting a card from their hand. Once chosen, the card is removed and cannot be played again.
 
@@ -10,7 +10,7 @@ import numpy as np
 import math
 ```
 
-## Game parameters
+### Game parameters
 
 First, we must specify the game itself. This includes defining the specific fractions used as cards as well as the corresponding number of these unique cards that we wish to include in a deck.
 
@@ -29,7 +29,7 @@ hand_size = 5
 num_rounds = 1+(deck_size-(num_players*hand_size))//num_players
 ```
 
-## Actions
+### Actions
 
 In order to simplify the decision-making process, we define three actions available to players. These actions include playing the largest card (which maximizes score), playing their median card, and playing the smallest score (which spoils the round).
 
@@ -37,6 +37,6 @@ In order to simplify the decision-making process, we define three actions availa
 
 ## References
 
-<a name="AshlockSchonfeldCardGames">[1]</a> D. Ashlock and J. Schonfeld. [Tools for deriving card games from mathematical games](http://eldar.mathstat.uoguelph.ca/dashlock/eprints/GTRY16.pdf). *Game & Puzzle Design*, 1(2):1–3, 2015. [&#x27A1;&#xfe0e;](#a1)
+<a name="AshlockSchonfeldCardGames"></a> [[1](#a1)] D. Ashlock and J. Schonfeld. [Tools for deriving card games from mathematical games](http://eldar.mathstat.uoguelph.ca/dashlock/eprints/GTRY16.pdf). *Game & Puzzle Design*, 1(2):1–3, 2015.
 
-<a name="BramsTaylor">[2]</a> S. J. Brams and A. D. Taylor. [Divide the dollar: three solutions and extensions](https://doi.org/10.1007/BF01079266). *Theory and Decision*, 37:211–231, 1994. [&#x27A1;&#xfe0e;](#a2)
+<a name="BramsTaylor"></a> [[2](#a2)] S. J. Brams and A. D. Taylor. [Divide the dollar: three solutions and extensions](https://doi.org/10.1007/BF01079266). *Theory and Decision*, 37:211–231, 1994.

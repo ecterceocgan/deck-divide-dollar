@@ -114,7 +114,7 @@ class MC(object):
 
 ## References
 
-<a name="WildThesis"</a> [[1](#a1)] E. Wild. [A study of heuristic approaches for solving generalized Nash equilibrium problems and related games](https://atrium.lib.uoguelph.ca/xmlui/handle/10214/11483). PhD thesis, *University of Guelph*, 2017.
+<a name="WildThesis"></a> [[1](#a1)] E. Wild. [A study of heuristic approaches for solving generalized Nash equilibrium problems and related games](https://atrium.lib.uoguelph.ca/xmlui/handle/10214/11483). PhD thesis, *University of Guelph*, 2017.
 
 <a name="AshlockSchonfeldCardGames"></a> [[2](#a2)] D. Ashlock and J. Schonfeld. [Tools for deriving card games from mathematical games](http://eldar.mathstat.uoguelph.ca/dashlock/eprints/GTRY16.pdf). *Game & Puzzle Design*, 1(2):1–3, 2015.
 

@@ -46,19 +46,19 @@ def load_deck():
 		d += [card]*num
 	return np.array(d)
 
-def play_action(card_showing, player, player_card_value, player_action):
+def play_action(card_showing, player, player_action):
 	if card_showing == num_cards: # player's going first
 		if player_action == 0:
-			card_showing = player[0]
 			player_card_value = cards[player[0]] # play smallest card
+			card_showing = player[0] # update card showing
 			player = np.delete(player, 0) # remove card from player's hand
 		elif player_action == 2:
-			card_showing = player[-1]
 			player_card_value = cards[player[-1]] # play largest card
+			card_showing = player[-1] # update card showing
 			player = np.delete(player, -1) # remove card from player's hand
 		else:
-			card_showing = player[hand_size//2]
 			player_card_value = cards[player[hand_size//2]] # play median card
+			card_showing = player[hand_size//2] # update card showing
 			player = np.delete(player, hand_size//2) # remove card from player's hand
 	else: # opponent went first, player's turn
 		if player_action == 0: # spoil with smallest card
@@ -154,22 +154,22 @@ for run in xrange(0,num_runs):
 							# Player 1 goes first
 							p1_game_state = [0, p1_cards[0], p1_cards[hand_size//2], p1_cards[-1], num_deals/(round_index+1), 0]
 							p1_action = bda_pop[p1_index].run(p1_game_state)
-							card_showing, p1_cards, p1_card_value = play_action(card_showing, p1_cards, p1_card_value, p1_action)
+							card_showing, p1_cards, p1_card_value = play_action(card_showing, p1_cards, p1_action)
 							
 							# Player 2 goes second
-							p2_game_state = [cards[card_showing], p2_cards[0], p2_cards[hand_size//2], p2_cards[-1],     num_deals/(round_index+1), 1]
+							p2_game_state = [cards[card_showing], p2_cards[0], p2_cards[hand_size//2], p2_cards[-1], num_deals/(round_index+1), 1]
 							p2_action = bda_pop[p2_index].run(p2_game_state)
-							card_showing, p2_cards, p2_card_value = play_action(card_showing, p2_cards, p2_card_value, p2_action)
+							card_showing, p2_cards, p2_card_value = play_action(card_showing, p2_cards, p2_action)
 						else:
 							# Player 2 goes first
 							p2_game_state = [0, p2_cards[0], p2_cards[hand_size//2], p2_cards[-1], num_deals/(round_index+1), 0]
 							p2_action = bda_pop[p2_index].run(p2_game_state)
-							card_showing, p2_cards, p2_card_value = play_action(card_showing, p2_cards, p2_card_value, p2_action)
+							card_showing, p2_cards, p2_card_value = play_action(card_showing, p2_cards, p2_action)
 							
 							# Player 1 goes second
-							p1_game_state = [cards[card_showing], p1_cards[0], p1_cards[hand_size//2], p1_cards[-1],     num_deals/(round_index+1), 1]
+							p1_game_state = [cards[card_showing], p1_cards[0], p1_cards[hand_size//2], p1_cards[-1], num_deals/(round_index+1), 1]
 							p1_action = bda_pop[p1_index].run(p1_game_state)
-							card_showing, p1_cards, p1_card_value = play_action(card_showing, p1_cards, p1_card_value, p1_action)
+							card_showing, p1_cards, p1_card_value = play_action(card_showing, p1_cards, p1_action)
 						
 						# Determine score for playing this hand
 						if p1_card_value + p2_card_value <= 1:

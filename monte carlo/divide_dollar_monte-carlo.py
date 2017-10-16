@@ -34,19 +34,19 @@ def load_deck():
 		d += [card]*num
 	return np.array(d)
 
-def play_action(card_showing, player, player_card_value, player_action):
+def play_action(card_showing, player, player_action):
 	if card_showing == num_cards: # player's going first
 		if player_action == 0:
-			card_showing = player[0]
 			player_card_value = cards[player[0]] # play smallest card
+			card_showing = player[0] # update card showing
 			player = np.delete(player, 0) # remove card from player's hand
 		elif player_action == 2:
-			card_showing = player[-1]
 			player_card_value = cards[player[-1]] # play largest card
+			card_showing = player[-1] # update card showing
 			player = np.delete(player, -1) # remove card from player's hand
 		else:
-			card_showing = player[hand_size//2]
 			player_card_value = cards[player[hand_size//2]] # play median card
+			card_showing = player[hand_size//2] # update card showing
 			player = np.delete(player, hand_size//2) # remove card from player's hand
 	else: # opponent went first, player's turn
 		if player_action == 0: # spoil with smallest card
@@ -112,7 +112,7 @@ for episode_index in xrange(num_episodes):
 			if round_index <= 1:
 				monte.policy_pi[int(mc_policy_index)] = np.random.randint(num_actions,size=1)[0] # for exploring starts take an initial random policy
 			mc_action = monte.policy_pi[int(mc_policy_index)]
-			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_card_value, mc_action)
+			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_action)
 			
 			# Opponent goes second
 			if opp_pol == 3:
@@ -120,7 +120,7 @@ for episode_index in xrange(num_episodes):
 			else:
 				opp_action = opp_pol # [0,1,or,2] execute opponent strategy
 				#opp_action = opp_pol[true_state_index[int(np.ravel_multi_index([card_showing,opp_cards[0],opp_cards[hand_size//2],opp_cards[-1]], dims=(num_cards+1,num_cards,num_cards,num_cards)))]] # self-play
-			card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_card_value, opp_action)
+			card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_action)
 		else:
 			# Opponent goes first
 			if opp_pol == 3:
@@ -128,7 +128,7 @@ for episode_index in xrange(num_episodes):
 			else:
 				opp_action = opp_pol # [0,1,or,2] execute opponent strategy
 				#opp_action = opp_pol[true_state_index[int(np.ravel_multi_index([card_showing,opp_cards[0],opp_cards[hand_size//2],opp_cardst[-1]], dims=(num_cards+1,num_cards,num_cards,num_cards)))]] # self-play
-			card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_card_value, opp_action)
+			card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_action)
 			
 			# MC player goes second
 			mc_game_state = [card_showing, mc_cards[0], mc_cards[hand_size//2], mc_cards[-1]]
@@ -137,7 +137,7 @@ for episode_index in xrange(num_episodes):
 			if round_index <= 1:
 				monte.policy_pi[int(mc_policy_index)] = np.random.randint(num_actions,size=1)[0] # for exploring starts take an initial random policy
 			mc_action = monte.policy_pi[int(mc_policy_index)]
-			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_card_value, mc_action)
+			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_action)
 		
 		# Determine score for playing this hand
 		if mc_card_value + opp_card_value <= 1:

@@ -87,30 +87,30 @@ The action value matrix, ```Q```, is calculated by dividing the cumulative rewar
 
 ```python
 class MC(object):
-	def __init__(self, num_states, num_actions):
-		# Initialize Monte Carlo agent
-		self.Q = np.zeros((num_states,num_actions))
-		self.policy_pi = np.random.randint(num_actions,size=num_states)
-		self.action_reward_sum = np.zeros((num_states,num_actions))
-		self.action_reward_count = np.zeros((num_states,num_actions))
-		self.state_seen = []
-	
-	def update(self, sta_ind, act_ind, reward):
-		# Accumulate these values used in computing statistics on this action value function Q^pi
-		self.action_reward_count[sta_ind, act_ind] += 1
-		self.action_reward_sum[sta_ind, act_ind] += reward
-		self.Q[sta_ind, act_ind] = self.action_reward_sum[sta_ind, act_ind]/self.action_reward_count[sta_ind, act_ind]
-		# Policy is greedy choice
-		self.policy_pi[sta_ind] = np.argmax(self.Q[sta_ind])
-	
-	def record_state_seen(self, game_state):
-		# Keep a record of the states seen so that action values can be updated at the end of the game
-		self.state_seen.append(np.array(game_state))
-	
-	def clear_states_seen(self):
-		# Clear the states seen (at the end of the game)
-		self.state_seen = []
-```
+    def __init__(self, num_states, num_actions):
+        # Initialize Monte Carlo agent
+        self.Q = np.zeros((num_states,num_actions))
+        self.policy_pi = np.random.randint(num_actions,size=num_states)
+        self.action_reward_sum = np.zeros((num_states,num_actions))
+        self.action_reward_count = np.zeros((num_states,num_actions))
+        self.state_seen = []
+    
+    def update(self, sta_ind, act_ind, reward):
+        # Accumulate these values used in computing statistics on this action value function Q^pi
+        self.action_reward_count[sta_ind, act_ind] += 1
+        self.action_reward_sum[sta_ind, act_ind] += reward
+        self.Q[sta_ind, act_ind] = self.action_reward_sum[sta_ind, act_ind]/self.action_reward_count[sta_ind, act_ind]
+        # Policy is greedy choice
+        self.policy_pi[sta_ind] = np.argmax(self.Q[sta_ind])
+    
+    def record_state_seen(self, game_state):
+        # Keep a record of the states seen so that action values can be updated at the end of the game
+        self.state_seen.append(np.array(game_state))
+    
+    def clear_states_seen(self):
+        # Clear the states seen (at the end of the game)
+        self.state_seen = []
+        ```
 
 ## References
 

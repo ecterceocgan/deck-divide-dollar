@@ -110,7 +110,7 @@ class MC(object):
     def clear_states_seen(self):
         # Clear the states seen (at the end of the game)
         self.state_seen = []
-        ```
+```
 
 ## References
 

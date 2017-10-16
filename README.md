@@ -65,7 +65,7 @@ The player's state at a specific moment in time is then defined as the aggregate
 
 In Monte Carlo policy evaluation, we estimate the value of the expected return when starting in state *s* and taking action *a*; and we call this the *action value* of a *state–action pair*.
 
-The expected return will depend on the reward signal and how it's defined. In this example, the reward is ```+1```, ```-1```, or ```0``` for winning, losing, or drawing the game, respectively. The goal is obviously to win games which means maximize the expected reward. Players do not receive any immediate reward after playing a hand. Due to this, players must play many rounds before finding out whether they have won or lost the game. They must learn which actions in an individual round correspond to winning the game later on.
+The expected return will depend on the reward signal and how it's defined. In this example, the reward is ```+1```, ```-1```, or ```0``` for winning, losing, or drawing the game, respectively. Winning a game means having the higher total score at the end of the 26 rounds—recall that each player scores the amount on their card played if the sum of the cards is less than one. The goal is obviously to win games which means maximize the expected reward. Players do not receive any immediate reward after playing a hand. Due to this, players must play many rounds before finding out whether they have won or lost the game. They must learn which actions in an individual round correspond to winning the game later on.
 
 Action values for state–action pairs will thus be in the range ```-1``` to ```+1```. If the estimated action value for a particular state–action pair is equal to ```+1```, then this means that the player eventually won the game every single time they chose that action while in that state. 
 
@@ -112,6 +112,27 @@ class MC(object):
         self.state_seen = []
 ```
 
+#### Estimating action values
+
+With Monte Carlo methods, learning requires only experience; that is, simulating episodes of interaction with the environment and averaging the returns of these sample sequences of states, actions, and rewards. As the Monte Carlo agent plays more games, more states and returns are thus observed, and the average of each state–action pair converges quadratically to the expected value <a name="a4"></a>[[4](#SuttonBarto)].
+
+Some states are intrinsically more rare than others since they depend on a subset of the sorted cards in a player's hand and do not account for the cards in between the smallest, median, and largest. For example, a state with the same smallest, median, and largest card requires an entire hand of the same card; whereas, it is possible for two hands to have the same smallest, median, and largest cards, but have different cards between the smallest and median and/or between the median and largest:
+
+```hand_1 = [¼, ¼, ½, ¾, ¾]```
+
+```hand_2 = [¼, ½, ½, ½, ¾]```
+
+Since the second and fourth cards above are not part of the definition of the game state, these two hands are considered to be the same in terms of the player's observed state.
+
+We've defined ```game_state = [card_showing, small, med, large]```, and thus there will be at most ```(num_cards+1)*(num_cards)*(num_cards)*(num_cards)``` possible states. However, we only consider a player's *sorted* hand. This reduces the number of possible states considerably:
+
+```python
+num_states = int((num_cards+1)*(math.factorial(3+num_cards-1))/(math.factorial(3)*math.factorial(num_cards-1)))
+```
+
+In order to ensure that we observe every state and the outcome of choosing any of the actions from each state, we use what's called the exploring starts assumption such that the first two rounds of a game start in a random state–action pair. Essentially this means that for every game during the learning process, the Monte Carlo agent selects a random action during the first two rounds rather than selecting the best action according to its policy (as in all subsequent rounds).
+
+
 ## References
 
 <a name="WildThesis"></a> [[1](#a1)] E. Wild. [A study of heuristic approaches for solving generalized Nash equilibrium problems and related games](https://atrium.lib.uoguelph.ca/xmlui/handle/10214/11483). PhD thesis, *University of Guelph*, 2017.
@@ -119,3 +140,5 @@ class MC(object):
 <a name="AshlockSchonfeldCardGames"></a> [[2](#a2)] D. Ashlock and J. Schonfeld. [Tools for deriving card games from mathematical games](http://eldar.mathstat.uoguelph.ca/dashlock/eprints/GTRY16.pdf). *Game & Puzzle Design*, 1(2):1–3, 2015.
 
 <a name="BramsTaylor"></a> [[3](#a3)] S. J. Brams and A. D. Taylor. [Divide the dollar: three solutions and extensions](https://doi.org/10.1007/BF01079266). *Theory and Decision*, 37:211–231, 1994.
+
+<a name="SuttonBarto"></a> [[4](#a4)] R. S. Sutton and A. G. Barto. *Reinforcement Learning: An Introduction (2nd Edition)*. The MIT Press, 2016.

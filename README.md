@@ -130,8 +130,48 @@ We've defined ```game_state = [card_showing, small, med, large]```, and thus the
 num_states = int((num_cards+1)*(math.factorial(3+num_cards-1))/(math.factorial(3)*math.factorial(num_cards-1)))
 ```
 
+```python
+true_state_index = [0,1,2,-1,3,4,-1,-1,5,-1,-1,-1,-1,6,7,-1,-1,8,-1,-1,-1,-1,-1,-1,-1,-1,9,10,11,12,-1,13,14,-1,-1,15,-1,-1,-1,-1,16,17,-1,-1,18,-1,-1,-1,-1,-1,-1,-1,-1,19,20,21,22,-1,23,24,-1,-1,25,-1,-1,-1,-1,26,27,-1,-1,28,-1,-1,-1,-1,-1,-1,-1,-1,29,30,31,32,-1,33,34,-1,-1,35,-1,-1,-1,-1,36,37,-1,-1,38,-1,-1,-1,-1,-1,-1,-1,-1,39]
+```
+
+> Note: if we assign an index of 0, 1, 2, or 3 to each of the unique cards (¼, ½, ¾) and the null (unplayed) card, respectively, we can map the game state information to a singular state index. For example, suppose the player is playing first and has the cards [¼, ¼, ½, ¾, ¾]. The game state information can thus be represented as [3, 0, 1, 2] using these card index values. From here we can use NumPy's ```ravel_multi_index()``` function to flatten this into an associated state index. Given that a number of states are impossible due to sorting, we transform this into a true state index using a lookup array.
+
+> ```python
+> state_index = true_state_index[np.ravel_multi_index([3,0,1,2], dims=(num_cards+1,num_cards,num_cards,num_cards)))]
+> 
+> ```
+
 In order to ensure that we observe every state and the outcome of choosing any of the actions from each state, we use what's called the exploring starts assumption such that the first two rounds of a game start in a random state–action pair. Essentially this means that for every game during the learning process, the Monte Carlo agent selects a random action during the first two rounds rather than selecting the best action according to its policy (as in all subsequent rounds).
 
+### Simulations
+
+We wish to simulate a number of games in which a Monte Carlo agent learns to play against a random opponent.
+
+```python
+num_games = 2000000
+```
+
+First, we define functions to initialize a Monte Carlo agent and to initialize a shuffled deck.
+
+```python
+def init_mc():
+    monte = mc.MC(num_states, num_actions)
+    return monte
+
+def load_deck():
+    d = []
+    for card, num in enumerate(num_of_unique_cards):
+        d += [card]*num
+    return np.array(d)
+```
+
+```python
+# Initialize Monte Carlo agent
+monte = init_mc()
+
+# Initialize deck
+deck = load_deck()
+```
 
 ## References
 

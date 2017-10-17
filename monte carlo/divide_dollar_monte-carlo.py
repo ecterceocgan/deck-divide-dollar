@@ -13,13 +13,14 @@ cards = [0.25, 0.50, 0.75] # specifies the unique cards in the deck: indexed as 
 num_of_unique_cards = [16, 28, 16] # specifies the total number of each of the unique cards
 num_cards = len(cards) # number of unique cards
 deck_size = sum(num_of_unique_cards) # total number of cards in the deck
-num_players = 2 # number of players
 hand_size = 5 # number of cards in a player's hand
+num_players = 2 # number of players
 num_rounds = 1+(deck_size-(num_players*hand_size))//num_players # number of hands to play (until deck runs out)
 num_episodes = 2000000 # number of full games to play
 
-## Parameters for MC specification ##
-num_actions = 3 # 0->small_spoil, 1->median, 2->large_max
+actions = {'small_spoil': 0, 'median': 1, 'large_max': 2}
+num_actions = len(actions)
+
 num_states = int((num_cards+1)*(math.factorial(3+num_cards-1))/(math.factorial(3)*math.factorial(num_cards-1)))
 #true_state_index = np.loadtxt('true_state_index.txt')
 true_state_index =  [0,1,2,-1,3,4,-1,-1,5,-1,-1,-1,-1,6,7,-1,-1,8,-1,-1,-1,-1,-1,-1,-1,-1,9,10,11,12,-1,13,14,-1,-1,15,-1,-1,-1,-1,16,17,-1,-1,18,-1,-1,-1,-1,-1,-1,-1,-1,19,20,21,22,-1,23,24,-1,-1,25,-1,-1,-1,-1,26,27,-1,-1,28,-1,-1,-1,-1,-1,-1,-1,-1,29,30,31,32,-1,33,34,-1,-1,35,-1,-1,-1,-1,36,37,-1,-1,38,-1,-1,-1,-1,-1,-1,-1,-1,39]
@@ -36,11 +37,11 @@ def load_deck():
 
 def play_action(card_showing, player, player_action):
 	if card_showing == num_cards: # player's going first
-		if player_action == 0:
+		if player_action == actions['small_spoil']:
 			player_card_value = cards[player[0]] # play smallest card
 			card_showing = player[0] # update card showing
 			player = np.delete(player, 0) # remove card from player's hand
-		elif player_action == 2:
+		elif player_action == actions['large_max']:
 			player_card_value = cards[player[-1]] # play largest card
 			card_showing = player[-1] # update card showing
 			player = np.delete(player, -1) # remove card from player's hand
@@ -49,7 +50,7 @@ def play_action(card_showing, player, player_action):
 			card_showing = player[hand_size//2] # update card showing
 			player = np.delete(player, hand_size//2) # remove card from player's hand
 	else: # opponent went first, player's turn
-		if player_action == 0: # spoil with smallest card
+		if player_action == actions['small_spoil']: # spoil with smallest card
 			for c, pcard in enumerate(player):
 				if cards[pcard] + cards[card_showing] > 1.0: # can spoil, play this card
 					player_card_value = cards[player[c]]
@@ -58,7 +59,7 @@ def play_action(card_showing, player, player_action):
 				elif c == len(player)-1: # can't spoil, play largest card
 					player_card_value = cards[player[-1]]
 					player = np.delete(player, -1) # remove card from player's hand
-		elif player_action == 2: # maximize score with largest card
+		elif player_action == actions['large_max']: # maximize score with largest card
 			for c, pcard in enumerate(np.flipud(player)):
 				if cards[pcard] + cards[card_showing] <= 1.0: # can maximize, play this card
 					player_card_value = cards[player[len(player)-1-c]]
@@ -73,7 +74,7 @@ def play_action(card_showing, player, player_action):
 	return card_showing, player, player_card_value
 
 monte = init_mc()
-opp_pol = 3 # 0->ALWAYSsmall_spoil, 1->ALWAYSmedian, 2->ALWAYSlarge_max, 3->random
+opp_pol = num_actions # 0->ALWAYSsmall_spoil, 1->ALWAYSmedian, 2->ALWAYSlarge_max, 3->random
 #opp_pol = np.copy(monte.policy_pi) # self-play
 
 wins = 0
@@ -110,13 +111,13 @@ for episode_index in xrange(num_episodes):
 			monte.record_state_seen(mc_game_state)
 			mc_policy_index = true_state_index[int(np.ravel_multi_index(mc_game_state, dims=(num_cards+1, num_cards, num_cards, num_cards)))]
 			if round_index <= 1:
-				monte.policy_pi[int(mc_policy_index)] = np.random.randint(num_actions,size=1)[0] # for exploring starts take an initial random policy
+				monte.policy_pi[int(mc_policy_index)] = np.random.choice(actions.values()) # for exploring starts take an initial random policy
 			mc_action = monte.policy_pi[int(mc_policy_index)]
 			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_action)
 			
 			# Opponent goes second
 			if opp_pol == 3:
-				opp_action = np.random.randint(3) # opponent strategy is to select random action
+				opp_action = np.random.choice(actions.values()) # opponent strategy is to select random action
 			else:
 				opp_action = opp_pol # [0,1,or,2] execute opponent strategy
 				#opp_action = opp_pol[true_state_index[int(np.ravel_multi_index([card_showing,opp_cards[0],opp_cards[hand_size//2],opp_cards[-1]], dims=(num_cards+1,num_cards,num_cards,num_cards)))]] # self-play
@@ -124,7 +125,7 @@ for episode_index in xrange(num_episodes):
 		else:
 			# Opponent goes first
 			if opp_pol == 3:
-				opp_action = np.random.randint(3) # opponent strategy is to select random action
+				opp_action = np.random.choice(actions.values()) # opponent strategy is to select random action
 			else:
 				opp_action = opp_pol # [0,1,or,2] execute opponent strategy
 				#opp_action = opp_pol[true_state_index[int(np.ravel_multi_index([card_showing,opp_cards[0],opp_cards[hand_size//2],opp_cardst[-1]], dims=(num_cards+1,num_cards,num_cards,num_cards)))]] # self-play
@@ -135,7 +136,7 @@ for episode_index in xrange(num_episodes):
 			monte.record_state_seen(mc_game_state)
 			mc_policy_index = true_state_index[int(np.ravel_multi_index(mc_game_state, dims=(num_cards+1, num_cards, num_cards, num_cards)))]
 			if round_index <= 1:
-				monte.policy_pi[int(mc_policy_index)] = np.random.randint(num_actions,size=1)[0] # for exploring starts take an initial random policy
+				monte.policy_pi[int(mc_policy_index)] = np.random.choice(actions.values()) # for exploring starts take an initial random policy
 			mc_action = monte.policy_pi[int(mc_policy_index)]
 			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_action)
 		

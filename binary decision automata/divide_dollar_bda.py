@@ -14,16 +14,17 @@ cards = [0.25, 0.50, 0.75] # specifies the unique cards in the deck: indexed as 
 num_of_unique_cards = [16, 28, 16] # specifies the total number of each of the unique cards
 num_cards = len(cards) # number of unique cards
 deck_size = sum(num_of_unique_cards) # total number of cards in the deck
+hand_size = 5 # number of cards in a player's hand--must be odd
 num_players = 2 # number of players
+num_rounds = 1+(deck_size-(num_players*hand_size))//num_players # number of hands to play (until deck runs out)
+num_episodes = 5 # number of games to play between two players (to ensure fair deck shuffling over time)
 
 ## Parameters for BDA specification ##
 bda_states = 8
-hand_size = 5 # number of cards in a player's hand--must be odd
-num_actions = bda.NUM_ACTIONS # 0->small_spoil, 1->median, 2->large_max
-#bda.MAX_TRANSITIONS = 10
 
-num_rounds = 1+(deck_size-(num_players*hand_size))//num_players # number of hands to play (until deck runs out)
-num_episodes = 5 # number of games to play between two players (to ensure fair deck shuffling over time)
+actions = {'small_spoil': 0, 'median': 1, 'large_max': 2}
+num_actions = len(actions)
+assert num_actions == bda.NUM_ACTIONS, "num_actions=%i does not match bda.NUM_ACTIONS=%i" % (num_actions, bda.NUM_ACTIONS)
 
 ## Parameters for evolution ##
 pop_size = 15
@@ -48,11 +49,11 @@ def load_deck():
 
 def play_action(card_showing, player, player_action):
 	if card_showing == num_cards: # player's going first
-		if player_action == 0:
+		if player_action == actions['small_spoil']:
 			player_card_value = cards[player[0]] # play smallest card
 			card_showing = player[0] # update card showing
 			player = np.delete(player, 0) # remove card from player's hand
-		elif player_action == 2:
+		elif player_action == actions['large_max']:
 			player_card_value = cards[player[-1]] # play largest card
 			card_showing = player[-1] # update card showing
 			player = np.delete(player, -1) # remove card from player's hand
@@ -61,7 +62,7 @@ def play_action(card_showing, player, player_action):
 			card_showing = player[hand_size//2] # update card showing
 			player = np.delete(player, hand_size//2) # remove card from player's hand
 	else: # opponent went first, player's turn
-		if player_action == 0: # spoil with smallest card
+		if player_action == actions['small_spoil']: # spoil with smallest card
 			for c, pcard in enumerate(player):
 				if cards[pcard] + cards[card_showing] > 1.0: # can spoil, play this card
 					player_card_value = cards[player[c]]
@@ -70,7 +71,7 @@ def play_action(card_showing, player, player_action):
 				elif c == len(player)-1: # can't spoil, play largest card
 					player_card_value = cards[player[-1]]
 					player = np.delete(player, -1) # remove card from player's hand
-		elif player_action == 2: # maximize score with largest card
+		elif player_action == actions['large_max']: # maximize score with largest card
 			for c, pcard in enumerate(np.flipud(player)):
 				if cards[pcard] + cards[card_showing] <= 1.0: # can maximize, play this card
 					player_card_value = cards[player[len(player)-1-c]]

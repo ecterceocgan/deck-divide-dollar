@@ -74,7 +74,8 @@ def play_action(card_showing, player, player_action):
 	return card_showing, player, player_card_value
 
 monte = init_mc()
-opp_pol = num_actions # 0->ALWAYSsmall_spoil, 1->ALWAYSmedian, 2->ALWAYSlarge_max, 3->random
+opp_strategies = {'always-small_spoil': 0, 'always-median': 1, 'always-large_max': 2, 'random': 3}
+opp_pol = opp_strategies['random']
 #opp_pol = np.copy(monte.policy_pi) # self-play
 
 wins = 0
@@ -116,7 +117,7 @@ for episode_index in xrange(num_episodes):
 			card_showing, mc_cards, mc_card_value = play_action(card_showing, mc_cards, mc_action)
 			
 			# Opponent goes second
-			if opp_pol == 3:
+			if opp_pol == opp_strategies['random']:
 				opp_action = np.random.choice(actions.values()) # opponent strategy is to select random action
 			else:
 				opp_action = opp_pol # [0,1,or,2] execute opponent strategy
@@ -124,7 +125,7 @@ for episode_index in xrange(num_episodes):
 			card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_action)
 		else:
 			# Opponent goes first
-			if opp_pol == 3:
+			if opp_pol == opp_strategies['random']:
 				opp_action = np.random.choice(actions.values()) # opponent strategy is to select random action
 			else:
 				opp_action = opp_pol # [0,1,or,2] execute opponent strategy
@@ -162,7 +163,7 @@ for episode_index in xrange(num_episodes):
 		wins += 1
 	elif mc_total_score < opp_total_score:
 		rew = -1
-	rew = mc_total_score - opp_total_score # different reward system
+	#rew = mc_total_score - opp_total_score # differential reward system
 	
 	# Accumulate these values used in computing statistics on this action value function Q^pi
 	for state_index in xrange(len(monte.state_seen)):
@@ -173,17 +174,6 @@ for episode_index in xrange(num_episodes):
 	#if episode_index % 5000 == 0:
 	#	print "...%i games played..." % episode_index
 	#	np.savetxt('Q-0_ep%i.txt' % episode_index, Q, fmt='%.8f')
-
-#print Q
-#print policy_pi
-
-#the_states = []
-#for a in xrange(4):
-#	for b in xrange(3):
-#		for c in xrange(3):
-#			for d in xrange(3):
-#				the_states.append([a,b,c,d,np.ravel_multi_index([a,b,c,d], dims=(4,3,3,3))])
-#np.savetxt('the_states.txt', np.array(the_states), fmt='%i')
 
 fraction_won.close()
 score_every_hand.close()

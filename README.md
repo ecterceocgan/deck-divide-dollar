@@ -44,7 +44,8 @@ num_rounds = 1+(deck_size-(num_players*hand_size))//num_players
 In order to simplify the decision-making process during each round, we define three actions available to players. These actions include playing their largest card (that maximizes score), playing their median card, and playing their smallest card (that spoils the round if playing second). 
 
 ```python
-num_actions = 3
+actions = {'small_spoil': 0, 'median': 1, 'large_max': 2}
+num_actions = len(actions)
 ```
 
 ### Game state information
@@ -135,10 +136,9 @@ true_state_index = [0,1,2,-1,3,4,-1,-1,5,-1,-1,-1,-1,6,7,-1,-1,8,-1,-1,-1,-1,-1,
 ```
 
 > Note: if we assign an index of 0, 1, 2, or 3 to each of the unique cards (¼, ½, ¾) and the null (unplayed) card, respectively, we can map the game state information to a singular state index. For example, suppose the player is playing first and has the cards [¼, ¼, ½, ¾, ¾]. The game state information can thus be represented as [3, 0, 1, 2] using these card index values. From here we can use NumPy's ```ravel_multi_index()``` function to flatten this into an associated state index. Given that a number of states are impossible due to sorting, we transform this into a true state index using a lookup array.
-
+> 
 > ```python
 > state_index = true_state_index[np.ravel_multi_index([3,0,1,2], dims=(num_cards+1,num_cards,num_cards,num_cards)))]
-> 
 > ```
 
 In order to ensure that we observe every state and the outcome of choosing any of the actions from each state, we use what's called the exploring starts assumption such that the first two rounds of a game start in a random state–action pair. Essentially this means that for every game during the learning process, the Monte Carlo agent selects a random action during the first two rounds rather than selecting the best action according to its policy (as in all subsequent rounds).
@@ -151,11 +151,11 @@ We wish to simulate a number of games in which a Monte Carlo agent learns to pla
 num_games = 2000000
 ```
 
-First, we define functions to initialize a Monte Carlo agent and to initialize a shuffled deck.
+First, we define functions to initialize a Monte Carlo agent and to load the deck.
 
 ```python
 def init_mc():
-    monte = mc.MC(num_states, num_actions)
+    monte = MC(num_states, num_actions)
     return monte
 
 def load_deck():
@@ -165,12 +165,145 @@ def load_deck():
     return np.array(d)
 ```
 
+Next we define a function that, given a player and their chosen action, performs the necessary steps to actually play the appropriate card and remove it from their hand. If the player is playing first, this function also updates the value of ```card_showing```.
+
+```python
+def play_action(card_showing, player, player_action):
+    player_card_value = 0
+    if card_showing == num_cards: # player's going first
+        if player_action == actions['small_spoil']:
+            player_card_value = cards[player[0]] # play smallest card
+            card_showing = player[0] # update card showing
+            player = np.delete(player, 0) # remove card from player's hand
+        elif player_action == actions['large_max']:
+            player_card_value = cards[player[-1]] # play largest card
+            card_showing = player[-1]
+            player = np.delete(player, -1)
+        else:
+            player_card_value = cards[player[hand_size//2]] # play median card
+            card_showing = player[hand_size//2]
+            player = np.delete(player, hand_size//2)
+    else: # opponent went first, player's turn
+        if player_action == actions['small_spoil']: # spoil with smallest card
+            for c, pcard in enumerate(player):
+                if cards[pcard] + cards[card_showing] > 1.0: # can spoil, play this card
+                    player_card_value = cards[player[c]]
+                    player = np.delete(player, c)
+                    break
+                elif c == len(player)-1: # can't spoil, play largest card
+                    player_card_value = cards[player[-1]]
+                    player = np.delete(player, -1)
+        elif player_action == actions['large_max']: # maximize score with largest card
+            for c, pcard in enumerate(np.flipud(player)):
+                if cards[pcard] + cards[card_showing] <= 1.0: # can maximize, play this card
+                    player_card_value = cards[player[len(player)-1-c]]
+                    player = np.delete(player, len(player)-1-c)
+                    break
+                elif len(player)-c == 0: # can't maximize, play smallest card
+                    player_card_value = cards[player[0]]
+                    player = np.delete(player, 0)
+        else:
+            player_card_value = cards[player[hand_size//2]] # play median card
+            player = np.delete(player, hand_size//2)
+    return card_showing, player, player_card_value
+```
+
+With these functions defined we can begin simulating games. However, we first need to initialize the Monte Carlo agent as well as its opponent. In particular we need to define the opponent's policy (or strategy) that will be used during these games. In this example we will only consider an opponent who chooses a random action during every turn. We could however define the opponent's policy in any way, including utilizing a self-play algorithm in which the opponent is a copy of our Monte Carlo agent.
+
 ```python
 # Initialize Monte Carlo agent
 monte = init_mc()
 
-# Initialize deck
-deck = load_deck()
+# Initialize opponent
+opp_strategies = {'always-small_spoil': 0, 'always-median': 1, 'always-large_max': 2, 'random': 3}
+opp_pol = opp_strategies['random']
+
+# Loop through and play each game
+for game_index in xrange(num_games):
+    # Load and shuffle deck
+    deck = load_deck()
+    np.random.shuffle(deck)
+    
+    # Initialize total score used to determine game winner
+    monte_total_score = 0
+    opp_total_score = 0
+    
+    # Deal and sort initial hands
+    monte_cards = np.sort(deck[:hand_size])
+    deck = deck[hand_size:]
+    opp_cards = np.sort(deck[:hand_size])
+    deck = deck[hand_size:]
+    
+    monte.clear_states_seen()
+    
+    # Loop through and play each round in a game
+    for round_index in xrange(num_rounds):
+        monte_card_value = 0
+        opp_card_value = 0
+        
+        # Determine the value of the card showing (0 if playing first; opponent's pick if playing second)
+        card_showing = num_cards # an index of 'num_cards' corresponds to no card showing (i.e. zero)
+        
+        if round_index % 2 == 0:
+            # MC player goes first
+            monte_game_state = [card_showing, monte_cards[0], monte_cards[hand_size//2], monte_cards[-1]]
+            monte.record_state_seen(monte_game_state)
+            monte_policy_index = true_state_index[int(np.ravel_multi_index(monte_game_state, dims=(num_cards+1, num_cards, num_cards, num_cards)))]
+            if round_index <= 1:
+                monte.policy_pi[int(monte_policy_index)] = np.random.choice(actions.values()) # for exploring starts take an initial random policy
+            monte_action = monte.policy_pi[int(monte_policy_index)]
+            card_showing, monte_cards, monte_card_value = play_action(card_showing, monte_cards, monte_action)
+            
+            # Opponent goes second
+            if opp_pol == 3:
+                opp_action = np.random.choice(actions.values()) # opponent strategy is to select random action
+            else:
+                opp_action = opp_pol # [0,1,or,2] execute opponent strategy
+                #opp_action = opp_pol[true_state_index[int(np.ravel_multi_index([card_showing,opp_cards[0],opp_cards[hand_size//2],opp_cards[-1]], dims=(num_cards+1,num_cards,num_cards,num_cards)))]] # self-play
+            card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_action)
+        else:
+            # Opponent goes first
+            if opp_pol == 3:
+                opp_action = np.random.choice(actions.values()) # opponent strategy is to select random action
+            else:
+                opp_action = opp_pol # [0,1,or,2] execute opponent strategy
+                #opp_action = opp_pol[true_state_index[int(np.ravel_multi_index([card_showing,opp_cards[0],opp_cards[hand_size//2],opp_cardst[-1]], dims=(num_cards+1,num_cards,num_cards,num_cards)))]] # self-play
+            card_showing, opp_cards, opp_card_value = play_action(card_showing, opp_cards, opp_action)
+            
+            # MC player goes second
+            monte_game_state = [card_showing, monte_cards[0], monte_cards[hand_size//2], monte_cards[-1]]
+            monte.record_state_seen(monte_game_state)
+            monte_policy_index = true_state_index[int(np.ravel_multi_index(monte_game_state, dims=(num_cards+1, num_cards, num_cards, num_cards)))]
+            if round_index <= 1:
+                monte.policy_pi[int(monte_policy_index)] = np.random.choice(actions.values()) # for exploring starts take an initial random policy
+            monte_action = monte.policy_pi[int(monte_policy_index)]
+            card_showing, monte_cards, monte_card_value = play_action(card_showing, monte_cards, monte_action)
+        
+        # Determine score for playing this hand
+        if monte_card_value + opp_card_value <= 1:
+            monte_total_score += monte_card_value
+            opp_total_score += opp_card_value
+        
+        # If deck isn't empty, pick up new cards
+        if len(deck) != 0:
+            monte_cards = np.sort(np.append(monte_cards, deck[:1]))
+            deck = deck[1:]
+        if len(deck) != 0:
+            opp_cards = np.sort(np.append(opp_cards, deck[:1]))
+            deck = deck[1:]
+        
+    # Determine final winner of the game and give out reward
+    rew = 0
+    if monte_total_score > opp_total_score:
+        rew = +1
+    elif monte_total_score < opp_total_score:
+        rew = -1
+    
+    # Accumulate these values used in computing statistics on this action value function Q^pi
+    for state_index in xrange(len(monte.state_seen)):
+        sta_ind = int(true_state_index[int(np.ravel_multi_index(monte.state_seen[state_index], dims=(num_cards+1,num_cards,num_cards,num_cards)))])
+        act_ind = int(true_state_index[int(monte.policy_pi[sta_ind])])
+        monte.update(sta_ind, act_ind, rew)
 ```
 
 ## References

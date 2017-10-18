@@ -36,6 +36,7 @@ def load_deck():
 	return np.array(d)
 
 def play_action(card_showing, player, player_action):
+	player_card_value = 0
 	if card_showing == num_cards: # player's going first
 		if player_action == actions['small_spoil']:
 			player_card_value = cards[player[0]] # play smallest card
@@ -173,7 +174,7 @@ for episode_index in xrange(num_episodes):
 	#opp_pol = np.copy(monte.policy_pi) # update opponent (self-play)
 	#if episode_index % 5000 == 0:
 	#	print "...%i games played..." % episode_index
-	#	np.savetxt('Q-0_ep%i.txt' % episode_index, Q, fmt='%.8f')
+	#	np.savetxt('Q-0_ep%i.txt' % episode_index, monte.Q, fmt='%.8f')
 
 fraction_won.close()
 score_every_hand.close()

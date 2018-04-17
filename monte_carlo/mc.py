@@ -59,8 +59,8 @@ class MonteCarloLearning(object):
         """Clear list of states seen."""
         self.states_seen = []
 
-    def print_mc(self, episode):
-        """Save current information about Monte Carlo agent to .txt files.
+    def save_learning(self, episode):
+        """Save current information about Monte Carlo learning to .txt files.
 
         Args:
             episode (int): number of training episodes elapsed

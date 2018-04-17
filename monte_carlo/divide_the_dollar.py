@@ -84,19 +84,28 @@ for episode_index in xrange(NUM_GAMES_TO_PLAY):
             card_showing = take_turn(opponent, round_index, sum_of_cards)
             sum_of_cards = take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
 
-        # TODO: determine score of round
+        if monte.last_card_played + opponent.last_card_played <= 1:
+            monte.total_score += monte.last_card_played
+            opponent.total_score += opponent.last_card_played
 
         monte.pick_up_cards(deck.deal_cards(1))
         opponent.pick_up_cards(deck.deal_cards(1))
 
     reward = 0
-    # TODO: determine winner of game and give out reward
+    if monte.total_score > opponent.total_score:
+        reward = +1
+        monte.wins += 1
+    elif monte.total_score < opponent.total_score:
+        reward = -1
+        opponent.wins += 1
 
-    for index in xrange(len(q_learning.states_seen)):
+    for state in xrange(len(q_learning.states_seen)):
         state_index = int(card_game.true_state_index[int(np.ravel_multi_index(
-            q_learning.states_seen[index], dims=(deck.num_unique_cards + 1,
+            q_learning.states_seen[state], dims=(deck.num_unique_cards + 1,
                                                  deck.num_unique_cards,
                                                  deck.num_unique_cards,
                                                  deck.num_unique_cards)))])
         action_index = int(card_game.true_state_index[int(q_learning.policy[state_index])])
         q_learning.update(state_index, action_index, reward)
+
+q_learning.save_learning(NUM_GAMES_TO_PLAY)

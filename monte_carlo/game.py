@@ -123,6 +123,8 @@ class Player(object):
         self.game_state = None
         self.next_action = None
         self.last_card_played = None
+        self.total_score = 0
+        self.wins = 0
 
     def update_policy(self, policy):
         self.policy = policy
@@ -139,3 +141,9 @@ class Player(object):
     def set_game_state(self, card_showing):
         median_card_index = len(self.hand) // 2
         self.game_state = [card_showing, self.hand[0], self.hand[median_card_index], self.hand[-1]]
+
+    def reset_score(self):
+        self.total_score = 0
+
+    def reset_wins(self):
+        self.wins = 0

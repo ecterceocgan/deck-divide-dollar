@@ -38,6 +38,7 @@ class MonteCarloLearning(object):
             reward (int): reward -1, 0, 1 corresponds to losing, drawing, winning the game
 
         """
+        assert reward in [-1, 0, 1], 'Invalid reward.'
         self.state_action_count[state_index, action_index] += 1
         self.state_action_reward_sum[state_index, action_index] += reward
         self.Q[state_index, action_index] = (self.state_action_reward_sum[state_index, action_index]

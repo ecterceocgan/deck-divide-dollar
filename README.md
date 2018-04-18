@@ -1,5 +1,6 @@
 ## About
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.org/erinwild/deck-divide-dollar.svg?branch=gh-pages)](https://travis-ci.org/erinwild/deck-divide-dollar)
 
 This work started as a final project for a machine learning course at the University of Guelph. The project compares two approaches to learning an optimal strategy for playing a deck- and turn-based version of the classic generalized Nash game called divide-the-dollar. Evolutionary computation is used to evolve players encoded as a finite-state machine, in contrast to Monte Carlo policy evaluation using reinforcement learning techniques.

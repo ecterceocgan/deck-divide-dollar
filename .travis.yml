@@ -13,3 +13,8 @@ install:
 script:
   - flake8 tests/
   - pytest
+
+branches:
+  only:
+  - gh-pages
+  - /.*/

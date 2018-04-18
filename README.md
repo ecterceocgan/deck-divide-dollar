@@ -1,5 +1,7 @@
 ## About
 
+[![Build Status](https://travis-ci.org/erinwild/deck-divide-dollar.svg?branch=gh-pages)](https://travis-ci.org/erinwild/deck-divide-dollar)
+
 This work started as a final project for a machine learning course at the University of Guelph. The project compares two approaches to learning an optimal strategy for playing a deck- and turn-based version of the classic generalized Nash game called divide-the-dollar. Evolutionary computation is used to evolve players encoded as a finite-state machine, in contrast to Monte Carlo policy evaluation using reinforcement learning techniques.
 
 After the end of the term, the research continued and was included as a chapter in my [doctoral thesis](https://atrium.lib.uoguelph.ca/xmlui/handle/10214/11483) <a name="a1"></a>[[1](#WildThesis)].

@@ -23,10 +23,15 @@ class MonteCarloLearning(object):
 
     def __init__(self, num_states, num_actions):
         """Initialize Monte Carlo Q-learning."""
-        self.Q = np.zeros((num_states, num_actions))
-        self.optimal_policy = np.random.randint(num_actions, size=num_states)
-        self.state_action_reward_sum = np.zeros((num_states, num_actions))
-        self.state_action_count = np.zeros((num_states, num_actions))
+        assert num_states > 0, 'Number of game states must be greater than zero.'
+        assert num_actions > 0, 'Number of possible actions must be greater than zero.'
+        self.num_states = num_states
+        self.num_actions = num_actions
+
+        self.Q = np.zeros((self.num_states, self.num_actions))
+        self.optimal_policy = np.random.randint(self.num_actions, size=self.num_states)
+        self.state_action_reward_sum = np.zeros((self.num_states, self.num_actions))
+        self.state_action_count = np.zeros((self.num_states, self.num_actions))
         self.states_seen = []
 
     def update(self, state_index, action_index, reward):
@@ -38,7 +43,8 @@ class MonteCarloLearning(object):
             reward (int): reward -1, 0, 1 corresponds to losing, drawing, winning the game
 
         """
-        assert reward in [-1, 0, 1], 'Invalid reward.'
+        assert state_index < self.num_states, 'Invalid state (does not exist).'
+        assert action_index < self.num_actions, 'Invalid action (does not exist).'
         self.state_action_count[state_index, action_index] += 1
         self.state_action_reward_sum[state_index, action_index] += reward
         self.Q[state_index, action_index] = (self.state_action_reward_sum[state_index, action_index]

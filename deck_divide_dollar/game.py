@@ -130,7 +130,8 @@ class Player(object):
         self.policy = policy
 
     def pick_up_cards(self, cards):
-        self.hand = np.sort(self.hand.append(cards))
+        assert isinstance(cards, list) or isinstance(cards, tuple)
+        self.hand = np.sort(self.hand + cards).tolist()
 
     def play_card(self, card_position_in_hand):
         card_value = self.hand[card_position_in_hand]
@@ -139,6 +140,7 @@ class Player(object):
         return card_value
 
     def set_game_state(self, card_showing):
+        """TODO: Remove this method; not appropriate for player class."""
         median_card_index = len(self.hand) // 2
         self.game_state = [card_showing, self.hand[0], self.hand[median_card_index], self.hand[-1]]
 

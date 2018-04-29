@@ -68,17 +68,15 @@ class CardGame(object):
     """
 
     def __init__(self, deck, num_players, actions, hand_size):
-        """Initialize card game.
-
-        TODO: factorial 3??
-        """
+        """Initialize card game."""
         self.num_players = num_players
         self.deck = deck
         self.actions = actions
         self.num_actions = len(actions)
         self.num_states = int((self.deck.unique_cards + 1)
-                              * (math.factorial(3 + self.deck.unique_cards - 1))
-                              / (math.factorial(3) * math.factorial(self.deck.unique_cards - 1)))
+                              * (math.factorial(self.num_actions + self.deck.unique_cards - 1))
+                              / (math.factorial(self.num_actions)
+                                 * math.factorial(self.deck.unique_cards - 1)))
         self.hand_size = hand_size
         self.num_rounds = 1 + (self.deck.deck_size
                                - (self.num_players * self.hand_size)) // self.num_players
@@ -135,7 +133,7 @@ class Player(object):
 
     def play_card(self, card_position_in_hand):
         card_value = self.hand[card_position_in_hand]
-        self.hand = np.delete(self.hand, 0)
+        self.hand = np.delete(self.hand, 0).tolist()
         self.last_card_played = card_value
         return card_value
 

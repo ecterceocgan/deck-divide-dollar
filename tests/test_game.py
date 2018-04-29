@@ -1,3 +1,7 @@
+from __future__ import division
+
+import math
+
 import numpy as np
 import pytest
 
@@ -17,14 +21,39 @@ class TestDeck(object):
 
 class TestCardGame(object):
     def test_init(self):
-        pass
+        cards = {1: 5, 2: 5, 3: 10}
+        deck = Deck(cards)
+        num_players = 3
+        actions = ['high', 'low']
+        hand_size = 3
+        card_game = CardGame(deck, num_players, actions, hand_size)
+        assert card_game.num_players == num_players
+        assert isinstance(card_game.deck, Deck)
+        assert card_game.actions == actions
+        assert card_game.num_actions == len(actions)
+        assert card_game.num_states == int((deck.unique_cards + 1)
+                                           * (math.factorial(len(actions) + deck.unique_cards - 1))
+                                           / (math.factorial(len(actions))
+                                              * math.factorial(deck.unique_cards - 1)))
+        assert card_game.hand_size == hand_size
+        assert card_game.num_rounds == 1 + (deck.deck_size
+                                            - (num_players * hand_size)) // num_players
+        assert card_game.true_state_index == [0, 1, 2, -1, 3, 4, -1, -1, 5, -1, -1, -1, -1,
+                                              6, 7, -1, -1, 8, -1, -1, -1, -1, -1, -1, -1, -1,
+                                              9, 10, 11, 12, -1, 13, 14, -1, -1, 15, -1, -1,
+                                              -1, -1, 16, 17, -1, -1, 18, -1, -1, -1, -1, -1,
+                                              -1, -1, -1, 19, 20, 21, 22, -1, 23, 24, -1, -1,
+                                              25, -1, -1, -1, -1, 26, 27, -1, -1, 28, -1, -1,
+                                              -1, -1, -1, -1, -1, -1, 29, 30, 31, 32, -1, 33,
+                                              34, -1, -1, 35, -1, -1, -1, -1, 36, 37, -1, -1,
+                                              38, -1, -1, -1, -1, -1, -1, -1, -1, 39]
 
 
 class TestPlayer(object):
     def test_init(self):
         policy = [1, 1, 1, 1]
         player = Player(policy)
-        assert all(i == j for i, j in zip(policy, player.policy))
+        assert player.policy == policy
         assert len(player.hand) == 0
         assert player.game_state is None
         assert player.next_action is None
@@ -37,7 +66,7 @@ class TestPlayer(object):
         player = Player(policy)
         new_policy = [2, 2, 2, 2]
         player.update_policy(new_policy)
-        assert all(i == j for i, j in zip(new_policy, player.policy))
+        assert player.policy == new_policy
 
     def test_pick_up_cards(self):
         policy = [1, 1, 1, 1]
@@ -69,7 +98,8 @@ class TestPlayer(object):
             card_value = player.play_card(0)
             assert card_value == hand[pos]
             assert player.last_card_played == card_value
-            assert all(i == j for i, j in zip(hand[pos+1:], player.hand))
+            assert isinstance(player.hand, list)
+            assert player.hand == hand[pos+1:]
 
     def test_reset_score(self):
         policy = [1, 1, 1, 1]

@@ -24,20 +24,19 @@ class Deck(object):
         self.cards = cards
         self.unique_cards = len(self.cards)
         self.deck_size = sum(self.cards.values())
-        self.current_deck = None
-        self.shuffle_deck()
+        self.current_deck = self.shuffle_deck()
 
     def shuffle_deck(self):
         """Initialize shuffled deck of (all) cards.
 
         Returns:
-            (array): shuffled deck of cards
+            (list): shuffled deck of cards
 
         """
         d = []
         for card, num in zip(self.cards.keys(), self.cards.values()):
             d += [card] * num
-        self.current_deck = np.random.shuffle(np.array(d))
+        return np.random.permutation(np.array(d)).tolist()
 
     def deal_cards(self, num_cards_to_deal):
         assert len(self.current_deck) >= num_cards_to_deal, \

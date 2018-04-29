@@ -27,18 +27,14 @@ class Deck(object):
         self.current_deck = self.shuffle_deck()
 
     def shuffle_deck(self):
-        """Initialize shuffled deck of (all) cards.
-
-        Returns:
-            (list): shuffled deck of cards
-
-        """
+        """Return shuffled deck of all cards."""
         d = []
         for card, num in zip(self.cards.keys(), self.cards.values()):
             d += [card] * num
         return np.random.permutation(np.array(d)).tolist()
 
     def deal_cards(self, num_cards_to_deal):
+        """Deal N cards from top of deck."""
         assert len(self.current_deck) >= num_cards_to_deal, \
             'Not enough cards left in deck to deal those cards.'
         dealt_cards = self.current_deck[:num_cards_to_deal]
@@ -114,7 +110,24 @@ class CardGame(object):
 
 
 class Player(object):
+    """Player of card game.
+
+    Args:
+        policy (list): an initial policy
+
+    Attributes:
+        policy (list): the player's optimal policy for choosing action when in state
+        hand (list): the player's cards in hand
+        game_state (array): the current state of the game
+        next_action: the player's chosen action to play next turn
+        last_card_played (float): the value of the last card played
+        total_score (float): the player's total score
+        wins (int): the player's total number of wins
+
+    """
+
     def __init__(self, policy):
+        """Initialize player."""
         self.policy = policy
         self.hand = []
         self.game_state = None
@@ -123,14 +136,17 @@ class Player(object):
         self.total_score = 0
         self.wins = 0
 
-    def update_policy(self, policy):
-        self.policy = policy
+    def update_policy(self, new_policy):
+        """Change player's optimal policy to new policy."""
+        self.policy = new_policy
 
     def pick_up_cards(self, cards):
+        """Add cards (list or tuple) to player's hand."""
         assert isinstance(cards, list) or isinstance(cards, tuple)
         self.hand = np.sort(self.hand + cards).tolist()
 
     def play_card(self, card_position_in_hand):
+        """Play specific card in hand."""
         card_value = self.hand[card_position_in_hand]
         self.hand = np.delete(self.hand, 0).tolist()
         self.last_card_played = card_value
@@ -142,7 +158,9 @@ class Player(object):
         self.game_state = [card_showing, self.hand[0], self.hand[median_card_index], self.hand[-1]]
 
     def reset_score(self):
+        """Reset player's score to zero."""
         self.total_score = 0
 
     def reset_wins(self):
+        """Reset player's win count to zero."""
         self.wins = 0

@@ -10,13 +10,34 @@ from deck_divide_dollar.game import CardGame, Deck, Player
 
 class TestDeck(object):
     def test_init(self):
-        pass
+        cards = {1: 5, 2: 5, 3: 10}
+        deck = Deck(cards)
+        assert deck.cards == cards
+        assert deck.unique_cards == len(cards)
+        assert deck.deck_size == sum(cards.values())
+        assert deck.current_deck is not None
 
     def test_shuffle_deck(self):
-        pass
+        cards = {1: 5, 2: 5, 3: 10}
+        deck = Deck(cards)
+        deck.shuffle_deck()
+        deck_of_cards = []
+        for card, num in zip(cards.keys(), cards.values()):
+            deck_of_cards += [card] * num
+        assert len(deck.current_deck) == len(deck_of_cards)
+        assert set(deck.current_deck).issubset(set(deck_of_cards))
 
     def test_deal_cards(self):
-        pass
+        cards = {card: 1 for card in xrange(10)}
+        deck = Deck(cards)
+        full_deck = deck.current_deck
+        hand = deck.deal_cards(5)
+        assert set(hand).issubset(set(full_deck))
+        assert set(deck.current_deck).issubset(set(full_deck))
+        assert len(set(hand + deck.current_deck).symmetric_difference(set(full_deck))) == 0
+
+        with pytest.raises(AssertionError):
+            deck.deal_cards(deck.deck_size + 1)
 
 
 class TestCardGame(object):

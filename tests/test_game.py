@@ -47,7 +47,7 @@ class TestCardGame(object):
         num_players = 3
         actions = ['high', 'low']
         hand_size = 3
-        card_game = CardGame(deck, num_players, actions, hand_size)
+        card_game = CardGame(deck, actions, hand_size, num_players)
         assert card_game.num_players == num_players
         assert isinstance(card_game.deck, Deck)
         assert card_game.actions == actions
@@ -121,6 +121,13 @@ class TestPlayer(object):
             assert player.last_card_played == card_value
             assert isinstance(player.hand, list)
             assert player.hand == hand[pos+1:]
+
+    def test_reset_hand(self):
+        policy = [1, 1, 1, 1]
+        player = Player(policy)
+        player.pick_up_cards([1, 2, 3, 4, 5])
+        player.reset_hand()
+        assert player.hand == []
 
     def test_reset_score(self):
         policy = [1, 1, 1, 1]

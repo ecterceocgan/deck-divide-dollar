@@ -6,7 +6,7 @@ import numpy as np
 
 
 class Deck(object):
-    """Deck.
+    """Deck of cards.
 
     Args:
         cards (dict): {card_value: unique_cards}
@@ -62,7 +62,7 @@ class CardGame(object):
 
     """
 
-    def __init__(self, deck, num_players, actions, hand_size):
+    def __init__(self, deck, actions, hand_size, num_players=2):
         """Initialize card game."""
         self.num_players = num_players
         self.deck = deck
@@ -156,6 +156,10 @@ class Player(object):
         """TODO: Remove this method; not appropriate for player class."""
         median_card_index = len(self.hand) // 2
         self.game_state = [card_showing, self.hand[0], self.hand[median_card_index], self.hand[-1]]
+
+    def reset_hand(self):
+        """Remove all cards from a player's hand."""
+        self.hand = []
 
     def reset_score(self):
         """Reset player's score to zero."""

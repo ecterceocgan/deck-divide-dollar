@@ -14,7 +14,7 @@ ACTIONS = ['small_spoil', 'median', 'large_max']
 NUM_GAMES_TO_PLAY = 2000000
 
 deck = Deck(CARDS_IN_DECK)
-card_game = CardGame(deck, NUM_PLAYERS, ACTIONS, HAND_SIZE)
+card_game = CardGame(deck, ACTIONS, HAND_SIZE, num_players=NUM_PLAYERS)
 
 
 def play_action(card_showing, player):
@@ -69,6 +69,8 @@ opponent = Player()
 for episode_index in xrange(NUM_GAMES_TO_PLAY):
     deck.shuffle_deck()
 
+    monte.reset_hand()
+    opponent.reset_hand()
     monte.pick_up_cards(deck.deal_cards(card_game.hand_size))
     opponent.pick_up_cards(deck.deal_cards(card_game.hand_size))
 
@@ -81,7 +83,7 @@ for episode_index in xrange(NUM_GAMES_TO_PLAY):
             sum_of_cards = take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
             sum_of_cards += take_turn(opponent, round_index, sum_of_cards)
         else:
-            card_showing = take_turn(opponent, round_index, sum_of_cards)
+            sum_of_cards = take_turn(opponent, round_index, sum_of_cards)
             sum_of_cards = take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
 
         if monte.last_card_played + opponent.last_card_played <= 1:

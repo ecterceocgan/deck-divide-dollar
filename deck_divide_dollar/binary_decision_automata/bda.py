@@ -22,15 +22,15 @@ class State(object):
 class BDA(object):
     def __init__(self, ns):
         self.num_states = ns
-        self.states = [State() for n in xrange(self.num_states)]
+        self.states = [State() for n in range(self.num_states)]
         self.current_state = 0
 
     def randomize(self):
-        for n in xrange(self.num_states):
+        for n in range(self.num_states):
             self.states[n].decision_index = random.randint(0,NUM_INPUTS-1)
             self.states[n].decision_type = random.randint(0,NUM_TESTS-1)
             self.states[n].threshold_val = random.randint(0,1000)/1000
-            for i in xrange(2):
+            for i in range(2):
                 self.states[n].actions[i] = random.randint(0,NUM_ACTIONS-1)
                 self.states[n].transitions[i] = random.randint(0,self.num_states-1)
 
@@ -71,7 +71,7 @@ class BDA(object):
             c = crossover_pt1
             crossover_pt1 = crossover_pt2
             crossover_pt2 = c
-        for i in xrange(crossover_pt1,crossover_pt2): # loop over positions to swap
+        for i in range(crossover_pt1,crossover_pt2): # loop over positions to swap
             # swap decision index
             sw = self.states[i].decision_index
             self.states[i].decision_index = other.states[i].decision_index
@@ -87,7 +87,7 @@ class BDA(object):
             self.states[i].threshold_val = other.states[i].threshold_val
             other.states[i].threshold_val = sw
 
-            for j in xrange(2):
+            for j in range(2):
                 # swap transitions
                 sw = self.states[i].transitions[j]
                 self.states[i].transitions[j] = other.states[i].transitions[j]
@@ -119,9 +119,9 @@ class BDA(object):
     def write_bda(self):
         #output = '%i\n' % self.num_states
         output = ''
-        for n in xrange(self.num_states):
+        for n in range(self.num_states):
             output += '%i %i %.3f ' % (self.states[n].decision_index, self.states[n].decision_type, self.states[n].threshold_val)
-            for i in xrange(2):
+            for i in range(2):
                 output += '%i %i ' % (self.states[n].actions[i], self.states[n].transitions[i])
             output += '\n'
         return output
@@ -143,7 +143,7 @@ class BDA(object):
         decision_text = ('>', '<', 'near')
 
         bda_output = '%i states\n' % self.num_states
-        for i in xrange(self.num_states):
+        for i in range(self.num_states):
             bda_output += '%i) if(%s %s %.3f) ' % (i, input_text[self.states[i].decision_index], decision_text[self.states[i].decision_type], self.states[i].threshold_val)
             bda_output += '%s-> %i else %s-> %i\n' % (action_text[self.states[i].actions[0]], self.states[i].transitions[0], action_text[self.states[i].actions[1]], self.states[i].transitions[1])
         return bda_output

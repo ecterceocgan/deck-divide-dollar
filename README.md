@@ -222,7 +222,7 @@ opp_strategies = {'always-small_spoil': 0, 'always-median': 1, 'always-large_max
 opp_pol = opp_strategies['random']
 
 # Loop through and play each game
-for game_index in xrange(num_games):
+for game_index in range(num_games):
     # Load and shuffle deck
     deck = load_deck()
     np.random.shuffle(deck)
@@ -240,7 +240,7 @@ for game_index in xrange(num_games):
     monte.clear_states_seen()
     
     # Loop through and play each round in a game
-    for round_index in xrange(num_rounds):
+    for round_index in range(num_rounds):
         monte_card_value = 0
         opp_card_value = 0
         
@@ -303,7 +303,7 @@ for game_index in xrange(num_games):
         rew = -1
     
     # Accumulate these values used in computing statistics on this action value function Q^pi
-    for state_index in xrange(len(monte.state_seen)):
+    for state_index in range(len(monte.state_seen)):
         sta_ind = int(true_state_index[int(np.ravel_multi_index(monte.state_seen[state_index], dims=(num_cards+1,num_cards,num_cards,num_cards)))])
         act_ind = int(true_state_index[int(monte.policy_pi[sta_ind])])
         monte.update(sta_ind, act_ind, rew)

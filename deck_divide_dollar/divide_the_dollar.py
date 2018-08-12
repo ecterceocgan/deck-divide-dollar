@@ -66,7 +66,7 @@ q_learning = MonteCarloLearning(card_game.num_states, card_game.num_actions)
 monte = Player()
 opponent = Player()
 
-for episode_index in xrange(NUM_GAMES_TO_PLAY):
+for episode_index in range(NUM_GAMES_TO_PLAY):
     deck.shuffle_deck()
 
     monte.reset_hand()
@@ -76,15 +76,15 @@ for episode_index in xrange(NUM_GAMES_TO_PLAY):
 
     q_learning.clear_states_seen()
 
-    for round_index in xrange(card_game.num_rounds):
+    for round_index in range(card_game.num_rounds):
         sum_of_cards = 0.
 
         if round_index % 2 == 0:
-            sum_of_cards = take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
+            sum_of_cards += take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
             sum_of_cards += take_turn(opponent, round_index, sum_of_cards)
         else:
-            sum_of_cards = take_turn(opponent, round_index, sum_of_cards)
-            sum_of_cards = take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
+            sum_of_cards += take_turn(opponent, round_index, sum_of_cards)
+            sum_of_cards += take_turn(monte, round_index, sum_of_cards, monte_carlo=True)
 
         if monte.last_card_played + opponent.last_card_played <= 1:
             monte.total_score += monte.last_card_played
@@ -101,7 +101,7 @@ for episode_index in xrange(NUM_GAMES_TO_PLAY):
         reward = -1
         opponent.wins += 1
 
-    for state in xrange(len(q_learning.states_seen)):
+    for state in range(len(q_learning.states_seen)):
         state_index = int(card_game.true_state_index[int(np.ravel_multi_index(
             q_learning.states_seen[state], dims=(deck.num_unique_cards + 1,
                                                  deck.num_unique_cards,

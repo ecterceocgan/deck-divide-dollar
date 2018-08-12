@@ -39,7 +39,7 @@ num_runs = 100
 
 def init_pop():
     pop = []
-    for i in xrange(pop_size+rand_pop_size):
+    for i in range(pop_size+rand_pop_size):
         pop.append(bda.BDA(bda_states))
         pop[i].randomize()
     return pop
@@ -110,32 +110,32 @@ def report_fit_stats(stats_file, run, fit):
     stats_file.write('%.6f %.6f %.6f %.6f\n' % (mean, ci[1], std, best))
 
 
-for run in xrange(0,num_runs):
-    print 'run %i' % run
+for run in range(0,num_runs):
+    print('run %i' % run)
     win_percen_file = open('win_percen-%i.txt' % run, 'w')
     plus_minus_file = open('plus_minus-%i.txt' % run, 'w')
     score_earned_file = open('score_earned-%i.txt' % run, 'w')
     score_diff_file = open('score_diff-%i.txt' % run, 'w')
     bda_pop = init_pop()
-    dx = np.array([i for i in xrange(pop_size)])  # sorting index
-    for gen in xrange(num_gens):
+    dx = np.array([i for i in range(pop_size)])  # sorting index
+    for gen in range(num_gens):
         #print 'gen %i' % gen
 
         if gen != 0:
-            for i in xrange(pop_size,pop_size+rand_pop_size):
+            for i in range(pop_size,pop_size+rand_pop_size):
                 bda_pop[i].randomize()
 
         # (fitness) score-keeping
-        wins = np.array([0 for i in xrange(pop_size+rand_pop_size)])
-        losses = np.array([0 for i in xrange(pop_size+rand_pop_size)])
-        plus_minus = np.array([0 for i in xrange(pop_size+rand_pop_size)])
-        score_earned = np.array([0 for i in xrange(pop_size+rand_pop_size)])
-        score_diff = np.array([0 for i in xrange(pop_size+rand_pop_size)])
+        wins = np.array([0 for i in range(pop_size+rand_pop_size)])
+        losses = np.array([0 for i in range(pop_size+rand_pop_size)])
+        plus_minus = np.array([0 for i in range(pop_size+rand_pop_size)])
+        score_earned = np.array([0 for i in range(pop_size+rand_pop_size)])
+        score_diff = np.array([0 for i in range(pop_size+rand_pop_size)])
 
         ## Round-robin Match-ups ##
-        for p1_index in xrange(pop_size): # Player 1 - evolving
-            for p2_index in xrange(pop_size,pop_size+rand_pop_size):  # Player 2 - random
-                for ep in xrange(num_episodes):
+        for p1_index in range(pop_size): # Player 1 - evolving
+            for p2_index in range(pop_size,pop_size+rand_pop_size):  # Player 2 - random
+                for ep in range(num_episodes):
                     # Load and shuffle deck
                     deck = load_deck()
                     np.random.shuffle(deck)
@@ -152,7 +152,7 @@ for run in xrange(0,num_runs):
                     p2_cards = np.sort(deck[:hand_size])
                     deck = deck[hand_size:]
 
-                    for round_index in xrange(num_rounds):
+                    for round_index in range(num_rounds):
                         p1_card_value = 0
                         p2_card_value = 0
 
@@ -230,7 +230,7 @@ for run in xrange(0,num_runs):
             bda_pop[dx[1]] = copy.deepcopy(bda_pop[dx[t_size-2]])
             bda_pop[dx[0]].two_point_crossover(bda_pop[dx[1]])
             # Mutation
-            for m in xrange(max_mutations):
+            for m in range(max_mutations):
                 bda_pop[dx[0]].mutate()
                 bda_pop[dx[1]].mutate()
 
@@ -241,4 +241,4 @@ for run in xrange(0,num_runs):
 
 
 end = time.clock()
-print "%.2f minutes" % ((end-start)/60)
+print("%.2f minutes" % ((end-start)/60))

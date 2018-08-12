@@ -20,12 +20,12 @@ class TestDeck(object):
         deck = Deck(cards)
         deck.shuffle_deck()
         deck_of_cards = [card for card, num in zip(cards.keys(), cards.values())
-                              for n in xrange(num)]
+                              for n in range(num)]
         assert len(deck.current_deck) == len(deck_of_cards)
         assert set(deck.current_deck).issubset(set(deck_of_cards))
 
     def test_deal_cards(self):
-        cards = {card: 1 for card in xrange(10)}
+        cards = {card: 1 for card in range(10)}
         deck = Deck(cards)
         full_deck = deck.current_deck
         hand = deck.deal_cards(5)
@@ -75,7 +75,7 @@ class TestPlayer(object):
         hand = [1, 2, 3, 4, 5]
         player.pick_up_cards(hand)
 
-        for pos in xrange(len(hand)):
+        for pos in range(len(hand)):
             card_value = player.play_card(0)
             assert card_value == hand[pos]
             assert player.last_card_played == card_value

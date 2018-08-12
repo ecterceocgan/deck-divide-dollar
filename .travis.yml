@@ -5,10 +5,7 @@ python:
 
 install:
   - pip install -r requirements.txt
-  - pip install flake8
-  - pip install flake8-comprehensions
-  - pip install flake8-quotes
-  - pip install pytest
+  - pip install flake8 flake8-comprehensions flake8-quotes flake8-builtins pytest
 
 script:
   - pytest

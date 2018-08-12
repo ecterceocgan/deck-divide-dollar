@@ -28,10 +28,10 @@ class Deck(object):
 
     def shuffle_deck(self):
         """Return shuffled deck of all cards."""
-        return random.shuffle(
-            [card for card, num in zip(self.cards.keys(), self.cards.values())
-                  for n in xrange(num)]
-        )
+        deck = [card for card, num in zip(self.cards.keys(), self.cards.values())
+                     for n in xrange(num)]
+        random.shuffle(deck)
+        return deck
 
     def deal_cards(self, num_cards_to_deal):
         """Deal N cards from top of deck."""

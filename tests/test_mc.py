@@ -3,7 +3,7 @@ from __future__ import division
 import numpy as np
 import pytest
 
-from deck_divide_dollar.mc import MonteCarloLearning
+from deck_divide_dollar.q_learning import MonteCarloLearning
 
 
 class TestMonteCarloLearning(object):

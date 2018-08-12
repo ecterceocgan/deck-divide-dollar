@@ -1,8 +1,5 @@
-from __future__ import division
-
 import math
-
-import numpy as np
+import random
 
 
 class Deck(object):
@@ -26,12 +23,15 @@ class Deck(object):
         self.deck_size = sum(self.cards.values())
         self.current_deck = self.shuffle_deck()
 
+    def __repr__(self):
+        return 'Deck(cards=%s)' % repr(self.cards)
+
     def shuffle_deck(self):
         """Return shuffled deck of all cards."""
-        d = []
-        for card, num in zip(self.cards.keys(), self.cards.values()):
-            d += [card] * num
-        return np.random.permutation(np.array(d)).tolist()
+        return random.shuffle(
+            [card for card, num in zip(self.cards.keys(), self.cards.values())
+                  for n in xrange(num)]
+        )
 
     def deal_cards(self, num_cards_to_deal):
         """Deal N cards from top of deck."""
@@ -40,73 +40,6 @@ class Deck(object):
         dealt_cards = self.current_deck[:num_cards_to_deal]
         self.current_deck = self.current_deck[num_cards_to_deal:]
         return dealt_cards
-
-
-class CardGame(object):
-    """Card game.
-
-    Args:
-        num_players (int): number of players playing the game
-        deck (Deck): deck of cards
-        actions (list): list of action names
-        hand_size (int): number of cards a player holds in their hand
-
-    Attributes:
-        num_players (int): number of players playing the game
-        deck (Deck): deck of cards
-        actions (list): list of action names
-        num_actions (int): number of unique actions
-        num_states (int): number of possible game states
-        hand_size (int): number of cards a player holds in their hand
-        num_rounds (int): number of rounds that are played in one game
-
-    """
-
-    def __init__(self, deck, actions, hand_size, num_players=2):
-        """Initialize card game."""
-        self.num_players = num_players
-        self.deck = deck
-        self.actions = actions
-        self.num_actions = len(actions)
-        self.num_states = int((self.deck.unique_cards + 1)
-                              * (math.factorial(self.num_actions + self.deck.unique_cards - 1))
-                              / (math.factorial(self.num_actions)
-                                 * math.factorial(self.deck.unique_cards - 1)))
-        self.hand_size = hand_size
-        self.num_rounds = 1 + (self.deck.deck_size
-                               - (self.num_players * self.hand_size)) // self.num_players
-        self.true_state_index = self._true_state_index()
-
-    def _true_state_index(self):
-        """Return the true index in list of unique states for each permutation.
-
-        For a potential game state permutation [card_showing, smallest, median, largest],
-        if smallest <= median <= largest does not hold, the permutation is an invalid game state
-        and the true state index should be a -1. For all valid permutations, the true state index
-        should be sequentially increasing.
-
-        Returns:
-            (list): true state index of valid permutations
-
-        """
-        states = []
-        unique_cards = self.deck.unique_cards
-        for card_showing in xrange(unique_cards + 1):
-            for smallest in xrange(unique_cards):
-                for median in xrange(unique_cards):
-                    for largest in xrange(unique_cards):
-                        states.append(np.array([card_showing, smallest, median, largest]))
-
-        true_state_index = []
-        true_index_counter = 0
-        for state in states:
-            if np.all(state[1:-1] <= state[2:]):
-                true_state_index.append(true_index_counter)
-                true_index_counter += 1
-            else:
-                true_state_index.append(-1)
-
-        return true_state_index
 
 
 class Player(object):
@@ -126,7 +59,9 @@ class Player(object):
 
     """
 
-    def __init__(self, policy):
+    hand_size = 7
+
+    def __init__(self, policy=None):
         """Initialize player."""
         self.policy = policy
         self.hand = []
@@ -136,19 +71,18 @@ class Player(object):
         self.total_score = 0
         self.wins = 0
 
-    def update_policy(self, new_policy):
-        """Change player's optimal policy to new policy."""
-        self.policy = new_policy
+    def __repr__(self):
+        return 'Player(policy=%s)' % repr(self.policy)
 
     def pick_up_cards(self, cards):
-        """Add cards (list or tuple) to player's hand."""
-        assert isinstance(cards, list) or isinstance(cards, tuple)
-        self.hand = np.sort(self.hand + cards).tolist()
+        """Add cards (list) to player's hand."""
+        assert isinstance(cards, (list))
+        self.hand = sorted(self.hand + cards)
 
     def play_card(self, card_position_in_hand):
-        """Play specific card in hand."""
+        """Play specific card by position in hand."""
         card_value = self.hand[card_position_in_hand]
-        self.hand = np.delete(self.hand, 0).tolist()
+        del self.hand[card_position_in_hand]
         self.last_card_played = card_value
         return card_value
 

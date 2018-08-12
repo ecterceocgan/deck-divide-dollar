@@ -4,7 +4,7 @@ from __future__ import division
 import numpy as np
 
 from game import CardGame, Deck, Player
-from mc import MonteCarloLearning
+from q_learning import MonteCarloLearning
 
 CARDS_IN_DECK = {0.25: 16, 0.50: 28, 0.75: 16}
 NUM_PLAYERS = 2

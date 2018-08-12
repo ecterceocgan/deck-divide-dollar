@@ -4,13 +4,13 @@ import math
 import numpy as np
 
 from game import Deck, Player
-from mc import MonteCarloLearning
+from q_learning import MonteCarloLearning
 
 
 class DeckBasedDivideTheDollar(object):
     """Deck-based divide-the-dollar.
 
-    Args:
+    Parameters:
         value_of_dollar (float): the threshold used for players' scoring card value vs. nothing
         deck (Deck):
         players (list of Players): list of Players, first is assumed to be Monte Carlo Q-Learner
@@ -24,7 +24,7 @@ class DeckBasedDivideTheDollar(object):
         self.players = players
         self.num_players = len(self.players)
         self.num_games_to_play = num_games_to_play
-        self,actions = ['small_spoil', 'median', 'large_max']
+        self.actions = ['small_spoil', 'median', 'large_max']
         self.num_actions = len(self.actions)
         self.num_states = ((deck.unique_cards + 1)
                            * (math.factorial(num_actions + deck.unique_cards - 1))
@@ -40,13 +40,13 @@ class DeckBasedDivideTheDollar(object):
     def play_games(self):
         """Play all games in order to converge to optimal policy via q-learning."""
         for episode_index in range(self.num_games_to_play):
-            self.initialize_episode()
-            self.play_rounds()
-            game_result = self.scorekeeping()  # reward for monte carlo player
-            self.aggregate_learning(game_result)
+            self._initialize_episode()
+            self._play_rounds()
+            game_result = self._scorekeeping()  # reward for monte carlo player
+            self._aggregate_learning(game_result)
         self.output()
 
-    def initialize_episode(self):
+    def _initialize_episode(self):
         """Initialize game by shuffling deck, and resetting players' hands and q-learning states."""
         self.deck.shuffle_deck()
         for player in self.players:
@@ -54,7 +54,7 @@ class DeckBasedDivideTheDollar(object):
             player.pick_up_cards(self.deck.deal_cards(Player.hand_size))
         self.q_learning.clear_states_seen()
 
-    def play_rounds(self):
+    def _play_rounds(self):
         """Play all rounds of game; players take turns going first."""
         turn_order = range(len(self.players))
         for round_index in range(self.num_rounds):
@@ -77,7 +77,7 @@ class DeckBasedDivideTheDollar(object):
     def _take_turn(self, player, round_index, card_showing, monte_carlo=False):
         """Select player's action given game state and play card.
 
-        Args:
+        Parameters:
             player (Player): player currently taking a turn
             round_index (int): index of round; used for exploring starts in monte carlo methods
             card_showing (float): sum of cards played thus far in current round
@@ -107,7 +107,7 @@ class DeckBasedDivideTheDollar(object):
     def _play_action(self, card_showing, player):
         """Given player's chosen action, play associated card.
 
-        Args:
+        Parameters:
             player (Player): player currently taking a turn
             card_showing (float): sum of cards played thus far in current round
 
@@ -142,14 +142,14 @@ class DeckBasedDivideTheDollar(object):
 
         return card_value
 
-    def scorekeeping(self):
+    def _scorekeeping(self):
         """Determine winner of game (highest total score).
 
         Players' total scores are sorted. If there is a clear winner (no ties),
         increase that player's win total.
 
         Returns:.
-            +1 reward if Monte Carlo learner won the game; -1 otherwise
+            +1 reward if Monte Carlo learner won the game; -1 for a loss; 0 for a draw
 
         """
         total_scores = [player.total_score for player in self.players]
@@ -158,20 +158,28 @@ class DeckBasedDivideTheDollar(object):
             self.players(win_order[0]).wins += 1
             if total_scores[0] == total_scores(win_order[0]):  # is monte carlo learner the winner?
                 reward = 1
-                return reward
-        # TODO: draws shouldn't result in negative reward
-        reward = -1
-        return reward
+            else:
+                reward = -1
+            return reward
+
+        return 0
 
 
-    def aggregate_learning(self, game_result):
+    def _aggregate_learning(self, game_result):
         """Use states seen during game and game result to update Monte Carlo q-learner.
 
-        Args:
+        Parameters:
             game_result: result of game from Monte Carlo agent's perspective (+1 for win; -1 for loss)
 
         """
-        pass
+        for state in range(len(self.q_learning.states_seen)):
+            state_index = int(true_state_index[int(np.ravel_multi_index(
+                self.q_learning.states_seen[state], dims=(self.deck.num_unique_cards + 1,
+                                                          self.deck.num_unique_cards,
+                                                          self.deck.num_unique_cards,
+                                                          self.deck.num_unique_cards)))])
+            action_index = int(card_game.true_state_index[int(self.q_learning.policy[state_index])])
+            self.q_learning.update(state_index, action_index, game_result)
 
 
 def true_state_index(self, unique_cards):

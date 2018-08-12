@@ -5,7 +5,7 @@ import random
 class Deck(object):
     """Deck of cards.
 
-    Args:
+    Parameters:
         cards (dict): {card_value: unique_cards}
 
     Attributes:
@@ -45,7 +45,7 @@ class Deck(object):
 class Player(object):
     """Player of card game.
 
-    Args:
+    Parameters:
         policy (list): an initial policy
 
     Attributes:

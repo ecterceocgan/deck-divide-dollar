@@ -8,7 +8,7 @@ class MonteCarloLearning(object):
 
     Optimal policy is initialized randomly.
 
-    Args:
+    Parameters:
         num_states (int): number of states in the game being played
         num_actions (int): number of actions in the game being played
 
@@ -37,7 +37,7 @@ class MonteCarloLearning(object):
     def update(self, state_index, action_index, reward):
         """Update statistics for action value function Q.
 
-        Args:
+        Parameters:
             state_index (int): array index of state
             action_index (int): array index of action
             reward (int): reward -1, 0, 1 corresponds to losing, drawing, winning the game
@@ -56,7 +56,7 @@ class MonteCarloLearning(object):
     def record_state_seen(self, game_state):
         """Add game_state to list of states seen by player.
 
-        Args:
+        Parameters:
             game_state (list): [card_showing, smallest, median, largest]
 
         """
@@ -69,7 +69,7 @@ class MonteCarloLearning(object):
     def save_learning(self, episode):
         """Save current information about Monte Carlo learning to .txt files.
 
-        Args:
+        Parameters:
             episode (int): number of training episodes elapsed
 
         Outputs:

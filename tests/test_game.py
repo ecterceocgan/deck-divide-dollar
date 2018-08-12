@@ -49,13 +49,6 @@ class TestPlayer(object):
         assert player.total_score == 0
         assert player.wins == 0
 
-    def test_update_policy(self):
-        policy = [1, 1, 1, 1]
-        player = Player(policy)
-        new_policy = [2, 2, 2, 2]
-        player.update_policy(new_policy)
-        assert player.policy == new_policy
-
     def test_pick_up_cards(self):
         policy = [1, 1, 1, 1]
         player = Player(policy)

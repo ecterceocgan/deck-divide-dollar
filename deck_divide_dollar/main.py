@@ -26,13 +26,13 @@ class DeckBasedDivideTheDollar(object):
         self.num_games_to_play = num_games_to_play
         self.actions = ['small_spoil', 'median', 'large_max']
         self.num_actions = len(self.actions)
-        self.num_states = ((deck.unique_cards + 1)
-                           * (math.factorial(num_actions + deck.unique_cards - 1))
-                           / (math.factorial(num_actions)
-                              * math.factorial(deck.unique_cards - 1)))
-        self.true_state_index = true_state_index(deck.unique_cards)
-        self.num_rounds = ((deck.deck_size - (self.num_players * Player.hand_size))
-                           // self.num_players) + 1
+        self.num_states = ((self.deck.unique_cards + 1)
+                           * (math.factorial(self.num_actions + self.deck.unique_cards - 1))
+                           / (math.factorial(self.num_actions)
+                              * math.factorial(self.deck.unique_cards - 1)))
+        self.true_state_index = true_state_index(self.deck.unique_cards)
+        self.num_rounds = ((self.deck.deck_size - (self.num_players * Player.hand_size))
+                           // self.num_players)
         self.q_learning = MonteCarloLearning(self.num_states, self.num_actions)
         for player in self.players:  # TODO: set initial policy, and update how?
             player.policy = self.q_learning.optimal_policy
@@ -44,11 +44,11 @@ class DeckBasedDivideTheDollar(object):
             self._play_rounds()
             game_result = self._scorekeeping()  # reward for monte carlo player
             self._aggregate_learning(game_result)
-        self.output()
+        self._save_output()
 
     def _initialize_episode(self):
-        """Initialize game by shuffling deck, and resetting players' hands and q-learning states."""
-        self.deck.shuffle_deck()
+        """Initialize game by shuffling deck and resetting players' hands and q-learning states."""
+        self.deck.reset_current_deck()
         for player in self.players:
             player.reset_hand()
             player.pick_up_cards(self.deck.deal_cards(Player.hand_size))
@@ -58,7 +58,7 @@ class DeckBasedDivideTheDollar(object):
         """Play all rounds of game; players take turns going first."""
         turn_order = range(len(self.players))
         for round_index in range(self.num_rounds):
-            sum_of_cards = 0.
+            sum_of_cards = 0.0
 
             for index in turn_order:
                 monte_carlo_agent = True if index == 0 else False
@@ -88,14 +88,15 @@ class DeckBasedDivideTheDollar(object):
 
         """
         player.set_game_state(card_showing)
+        game_state = [self.deck.card_index[card_value] for card_value in player.game_state]
         if monte_carlo:
-            self.q_learning.record_state_seen(player.game_state)
+            self.q_learning.record_state_seen(game_state)
 
         policy_index = int(self.true_state_index[int(np.ravel_multi_index(
-            player.game_state, dims=(self.deck.num_unique_cards + 1,
-                                     self.deck.num_unique_cards,
-                                     self.deck.num_unique_cards,
-                                     self.deck.num_unique_cards)))])
+            game_state, dims=(self.deck.unique_cards + 1,
+                              self.deck.unique_cards,
+                              self.deck.unique_cards,
+                              self.deck.unique_cards)))])
 
         if monte_carlo and (round_index <= 1):  # exploring starts
             player.next_action = np.random.choice(self.num_actions)
@@ -115,6 +116,7 @@ class DeckBasedDivideTheDollar(object):
             card value of action played
 
         """
+        card_value = 0
         if card_showing == 0:  # player goes first
             if player.next_action == self.actions.index('small_spoil'):
                 card_value = player.play_card(0)
@@ -135,7 +137,7 @@ class DeckBasedDivideTheDollar(object):
                     if card + card_showing <= self.value_of_dollar:  # can maximize, play this card
                         card_value = player.play_card(len(player.hand) - 1 - c)
                         break
-                    elif len(player) - c == 0:  # can't maximize, play smallest card
+                    elif len(player.hand) - c == 0:  # can't maximize, play smallest card
                         card_value = player.play_card(0)
             else:
                 card_value = player.play_card(Player.hand_size // 2)
@@ -154,9 +156,9 @@ class DeckBasedDivideTheDollar(object):
         """
         total_scores = [player.total_score for player in self.players]
         win_order = np.argsort(total_scores)[::-1]
-        if total_scores(win_order[0]) > total_scores(win_order[1]):  # must have clear winner
-            self.players(win_order[0]).wins += 1
-            if total_scores[0] == total_scores(win_order[0]):  # is monte carlo learner the winner?
+        if total_scores[win_order[0]] > total_scores[win_order[1]]:  # must have clear winner
+            self.players[win_order[0]].wins += 1
+            if total_scores[0] == total_scores[win_order[0]]:  # is monte carlo learner the winner?
                 reward = 1
             else:
                 reward = -1
@@ -173,16 +175,20 @@ class DeckBasedDivideTheDollar(object):
 
         """
         for state in range(len(self.q_learning.states_seen)):
-            state_index = int(true_state_index[int(np.ravel_multi_index(
-                self.q_learning.states_seen[state], dims=(self.deck.num_unique_cards + 1,
-                                                          self.deck.num_unique_cards,
-                                                          self.deck.num_unique_cards,
-                                                          self.deck.num_unique_cards)))])
-            action_index = int(card_game.true_state_index[int(self.q_learning.policy[state_index])])
+            state_index = int(self.true_state_index[int(np.ravel_multi_index(
+                self.q_learning.states_seen[state], dims=(self.deck.unique_cards + 1,
+                                                          self.deck.unique_cards,
+                                                          self.deck.unique_cards,
+                                                          self.deck.unique_cards)))])
+            action_index = int(self.true_state_index[
+                int(self.q_learning.optimal_policy[state_index])])
             self.q_learning.update(state_index, action_index, game_result)
 
+    def _save_output(self):
+        self.q_learning.save_learning(self.num_games_to_play)
 
-def true_state_index(self, unique_cards):
+
+def true_state_index(unique_cards):
     """Return the true index in list of unique states for each permutation.
 
     For a potential game state permutation [card_showing, smallest, median, largest],
@@ -217,4 +223,5 @@ if __name__ == 'main':
     deck = Deck(cards_in_deck)
     players = [Player() for _ in range(num_players)]
 
-    game = DeckBasedDivideTheDollar(value_of_dollar, deck, players, num_games_to_play)
+    divide_the_dollar = DeckBasedDivideTheDollar(deck, players, num_games_to_play, value_of_dollar)
+    divide_the_dollar.play_games()

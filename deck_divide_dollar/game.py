@@ -12,6 +12,7 @@ class Deck(object):
         cards (dict): {card_value: num_cards}
         unique_cards (int): number of unique card values
         deck_size (int): total number of cards in the deck
+        card_index (dict): maps each unique card to an integer for indexing purposes
         current_deck (list): full list of cards remaining in deck
 
     """
@@ -21,6 +22,8 @@ class Deck(object):
         self.cards = cards
         self.unique_cards = len(self.cards)
         self.deck_size = sum(self.cards.values())
+        self.card_index = {card_value: i
+                           for i, card_value in enumerate(sorted(self.cards.keys()) + [0])}
         self.current_deck = self.shuffle_deck()
 
     def __repr__(self):
@@ -32,6 +35,9 @@ class Deck(object):
                      for n in range(num)]
         random.shuffle(deck)
         return deck
+
+    def reset_current_deck(self):
+        self.current_deck = self.shuffle_deck()
 
     def deal_cards(self, num_cards_to_deal):
         """Deal N cards from top of deck."""

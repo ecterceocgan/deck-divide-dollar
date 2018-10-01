@@ -1,10 +1,8 @@
 """Monte Carlo agent learns to play divide-the-dollar."""
-from __future__ import division
-
 import numpy as np
 
-from game import CardGame, Deck, Player
-from q_learning import MonteCarloLearning
+from .game import CardGame, Deck, Player
+from .q_learning import MonteCarloLearning
 
 CARDS_IN_DECK = {0.25: 16, 0.50: 28, 0.75: 16}
 NUM_PLAYERS = 2

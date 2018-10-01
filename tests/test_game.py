@@ -1,8 +1,6 @@
-import math
-
-import numpy as np
 import pytest
 
+import numpy as np
 from deck_divide_dollar.game import Deck, Player
 
 

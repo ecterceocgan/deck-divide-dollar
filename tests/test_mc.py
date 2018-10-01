@@ -1,8 +1,6 @@
-from __future__ import division
-
-import numpy as np
 import pytest
 
+import numpy as np
 from deck_divide_dollar.q_learning import MonteCarloLearning
 
 

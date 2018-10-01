@@ -3,8 +3,8 @@ import math
 
 import numpy as np
 
-from game import Deck, Player
-from q_learning import MonteCarloLearning
+from .game import Deck, Player
+from .q_learning import MonteCarloLearning
 
 
 class DeckBasedDivideTheDollar(object):

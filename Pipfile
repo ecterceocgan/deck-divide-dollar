@@ -7,11 +7,13 @@ name = "pypi"
 numpy = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-cov = "*"
 "flake8" = "*"
 "flake8-comprehensions" = "*"
 "flake8-quotes" = "*"
 "flake8-builtins" = "*"
-pytest = "*"
+"flake8-isort" = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"

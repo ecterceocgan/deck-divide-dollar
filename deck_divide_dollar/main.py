@@ -166,12 +166,12 @@ class DeckBasedDivideTheDollar(object):
 
         return 0
 
-
     def _aggregate_learning(self, game_result):
         """Use states seen during game and game result to update Monte Carlo q-learner.
 
         Parameters:
-            game_result: result of game from Monte Carlo agent's perspective (+1 for win; -1 for loss)
+            game_result: result of game from Monte Carlo agent's perspective
+                (+1 for win; -1 for loss)
 
         """
         for state in range(len(self.q_learning.states_seen)):

@@ -31,7 +31,7 @@ class Deck(object):
     def shuffle_deck(self):
         """Return shuffled deck of all cards."""
         deck = [card for card, num in zip(self.cards.keys(), self.cards.values())
-                     for n in range(num)]
+                for n in range(num)]
         random.shuffle(deck)
         return deck
 

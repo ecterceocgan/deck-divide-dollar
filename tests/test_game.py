@@ -18,7 +18,7 @@ class TestDeck(object):
         deck = Deck(cards)
         deck.shuffle_deck()
         deck_of_cards = [card for card, num in zip(cards.keys(), cards.values())
-                              for n in range(num)]
+                         for n in range(num)]
         assert len(deck.current_deck) == len(deck_of_cards)
         assert set(deck.current_deck).issubset(set(deck_of_cards))
 

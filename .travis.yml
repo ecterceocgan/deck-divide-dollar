@@ -10,13 +10,19 @@ matrix:
       sudo: true
 
 install:
-  - pip install pipenv
+  - pip install pipenv codecov
   - pipenv install --dev --deploy
 
+before_script:
+  - flake8 deck_divide_dollar
+
 script:
-  - pytest
+  - pytest --cov=deck_divide_dollar --cov-report term --cov-report xml
 
 branches:
   only:
   - gh-pages
   - /.*/
+
+after_success:
+  - codecov

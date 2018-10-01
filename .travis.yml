@@ -10,8 +10,8 @@ matrix:
       sudo: true
 
 install:
-  - pip install -r requirements.txt
-  - pip install flake8 flake8-comprehensions flake8-quotes flake8-builtins pytest
+  - pip install pipenv
+  - pipenv install --dev --deploy
 
 script:
   - pytest
